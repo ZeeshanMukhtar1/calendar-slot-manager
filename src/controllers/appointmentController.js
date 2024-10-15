@@ -39,13 +39,20 @@ exports.getAvailableSlots = async (req, res) => {
 };
 
 exports.bookSlot = async (req, res) => {
+  console.log("Received request body:", JSON.stringify(req.body));
   const { start, end, summary } = req.body;
+  console.log(
+    `Extracted booking details: start=${start}, end=${end}, summary=${summary}`
+  );
+
   try {
+    console.log("Calling googleCalendarService.bookSlot");
     const bookedSlot = await googleCalendarService.bookSlot(
       start,
       end,
       summary
     );
+    console.log("Slot booked successfully:", JSON.stringify(bookedSlot));
     res.json({
       success: true,
       data: bookedSlot,
@@ -53,10 +60,15 @@ exports.bookSlot = async (req, res) => {
     });
   } catch (error) {
     console.error("Error booking slot:", error);
+    console.error(
+      "Error details:",
+      JSON.stringify(error, Object.getOwnPropertyNames(error))
+    );
     res.status(500).json({
       success: false,
       error: "Failed to book slot",
       message: error.message,
+      details: error.stack,
     });
   }
 };
